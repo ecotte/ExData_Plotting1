@@ -9,11 +9,14 @@ file_source = "Data/household_power_consumption.txt";
 #Read the file with fread, use character as the column classes for faster load.
 x<-fread(file_source,header = TRUE,colClasses = "character");
 
+#Filter data to use only february 01 and 02 of 2007
+x<-x[x$Date=="1/2/2007"|x$Date=="2/2/2007"];
+
 #Convert Date column to Date class
 x$Date<-as.Date(x$Date,"%d/%m/%Y");
 
-#Filter data to use only february 01 and 02 of 2007
-x<-x[x$Date==as.Date("2007-02-02")|x$Date==as.Date("2007-02-01")];
+#Create DateTime column
+x$DateTime <- as.POSIXct(paste(as.Date(x$Date),x$Time))
 
 #Convert Global_active_power column to Double
 x$Global_active_power<-as.double(x$Global_active_power);
@@ -22,11 +25,7 @@ x$Global_active_power<-as.double(x$Global_active_power);
 png("plot2.png");
 
 #Create a line plot of the Global_active_power
-plot(x$Global_active_power,type = "n",xaxt = "n",xlab = "",ylab = "Global Active Power (kilowatts)");
-lines(x$Global_active_power);
-axis(1,at = 1, labels = "Thu")
-axis(1,at = nrow(x), labels = "Fri");
-axis(1,at = nrow(x)/2, labels = "Sat");
+plot(x$DateTime,x$Global_active_power,type = "l",xlab = "",ylab = "Global Active Power (kilowatts)");
 
 #Close Graphic Device
 dev.off()
